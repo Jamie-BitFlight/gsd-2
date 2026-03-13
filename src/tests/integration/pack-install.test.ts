@@ -1,10 +1,12 @@
 /**
  * Integration tests for npm pack and install.
  *
- * These tests spawn child processes (npm run build, npm pack, tar, node)
+ * These tests spawn child processes (npm pack, tar, node)
  * and are resource-intensive. Run separately from unit tests.
  *
- * Run with: npm run test:integration
+ * Prerequisite: npm run build must be run first.
+ *
+ * Run with: npm run build && npm run test:integration
  */
 
 import test from "node:test";
@@ -22,10 +24,7 @@ const projectRoot = join(fileURLToPath(import.meta.url), "..", "..", "..", "..")
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("npm pack produces tarball with required files", async () => {
-  // Build first
-  execSync("npm run build", { cwd: projectRoot, stdio: "pipe" });
-
-  // Pack
+  // Pack (assumes build already done)
   const packOutput = execSync("npm pack --json 2>/dev/null", {
     cwd: projectRoot,
     encoding: "utf-8",
@@ -67,8 +66,7 @@ test("npm pack produces tarball with required files", async () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("tarball installs and gsd binary resolves", async () => {
-  // Build and pack
-  execSync("npm run build", { cwd: projectRoot, stdio: "pipe" });
+  // Pack (assumes build already done)
   const packOutput = execSync("npm pack --json 2>/dev/null", {
     cwd: projectRoot,
     encoding: "utf-8",
@@ -109,11 +107,9 @@ test("tarball installs and gsd binary resolves", async () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("gsd launches and loads extensions without errors", async () => {
-  // Build first
-  execSync("npm run build", { cwd: projectRoot, stdio: "pipe" });
-
   // Launch gsd with all optional keys set (skip wizard) and capture stderr.
   // Kill after 5 seconds — we just need to see if extensions load.
+  // Assumes build already done.
   const output = await new Promise<string>((resolve) => {
     let stderr = "";
     const child = spawn("node", ["dist/loader.js"], {
