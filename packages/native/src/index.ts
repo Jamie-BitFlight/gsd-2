@@ -9,6 +9,7 @@
  * - highlight: syntect-based syntax highlighting
  * - html: HTML to Markdown conversion
  * - text: ANSI-aware text measurement and slicing
+ * - fd: fuzzy file path discovery for autocomplete and @-mention resolution
  */
 
 export {
@@ -70,3 +71,10 @@ export {
   EllipsisKind,
 } from "./text/index.js";
 export type { SliceResult, ExtractSegmentsResult } from "./text/index.js";
+
+export { fuzzyFind } from "./fd/index.js";
+export type {
+  FuzzyFindMatch,
+  FuzzyFindOptions,
+  FuzzyFindResult,
+} from "./fd/index.js";

@@ -86,4 +86,5 @@ export const native = loadNative() as {
   ) => unknown;
   sanitizeText: (text: string) => string;
   visibleWidth: (text: string, tabWidth?: number) => number;
+  fuzzyFind: (options: unknown) => unknown;
 };
