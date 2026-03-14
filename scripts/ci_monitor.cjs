@@ -17,7 +17,12 @@ const gh = (args, opts = {}) => {
   return r.stdout;
 };
 const ghJson = (args, opts) => JSON.parse(gh(args, opts));
-const getRepo = () => process.env.GITHUB_REPOSITORY || ghJson(['repo', 'view', '--json', 'nameWithOwner']).nameWithOwner;
+const cliRepo = (() => {
+  const a = process.argv;
+  const i = a.findIndex(x => x === '--repo' || x === '-R');
+  return i >= 0 && a[i + 1] ? a[i + 1] : null;
+})();
+const getRepo = () => cliRepo || process.env.GITHUB_REPOSITORY || ghJson(['repo', 'view', '--json', 'nameWithOwner']).nameWithOwner;
 const runView = (id, f = 'status,conclusion,jobs') => ghJson(['run', 'view', String(id), '--repo', getRepo(), '--json', f]);
 const runList = (opts = {}) => {
   const args = ['run', 'list', '--repo', getRepo(), '--limit', String(opts.limit || 10),
@@ -25,7 +30,7 @@ const runList = (opts = {}) => {
   if (opts.branch) args.push('--branch', opts.branch);
   return ghJson(args);
 };
-const getLogs = (runId, jobId) => gh(['api', `repos/${getRepo()}/actions/jobs/${jobId}/logs`], { maxBuffer: MAXBUF });
+const getLogs = (runId, jobId) => gh(['run', 'view', String(runId), '--repo', getRepo(), '--log', '--job', String(jobId)], { maxBuffer: MAXBUF });
 const findJob = (runId, name) => {
   const job = runView(runId, 'jobs').jobs?.find(j => j.name === name);
   if (!job) { console.error(`❌ Job "${name}" not found`); process.exit(1); }
@@ -259,7 +264,7 @@ COMMANDS:
   list-workflows                      List all workflow files
   check-actions [file]                Check action versions via GraphQL
 
-OPTIONS: --interval, --timeout, --lines, --filter, --pattern, --context, --branch, --keyword, --limit
+OPTIONS: --interval, --timeout, --lines, --filter, --pattern, --context, --branch, --keyword, --limit, --repo/-R
 `;
 
 const REQ = {

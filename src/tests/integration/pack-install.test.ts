@@ -11,7 +11,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { execSync, spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -24,10 +24,11 @@ const projectRoot = process.cwd();
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("npm pack produces tarball with required files", async () => {
-  // Pack (assumes build already done)
-  const packOutput = execSync("npm pack --json 2>/dev/null", {
+  // Pack (build already done by test:integration script)
+  const packOutput = execFileSync("npm", ["pack", "--json"], {
     cwd: projectRoot,
     encoding: "utf-8",
+    stdio: ["ignore", "pipe", "ignore"],
   });
   const packInfo = JSON.parse(packOutput);
   const tarball = packInfo[0].filename;
@@ -37,7 +38,7 @@ test("npm pack produces tarball with required files", async () => {
 
   try {
     // List tarball contents
-    const contents = execSync(`tar tzf ${tarballPath}`, { encoding: "utf-8" });
+    const contents = execFileSync("tar", ["tzf", tarballPath], { encoding: "utf-8" });
     const files = contents.split("\n").filter(Boolean);
 
     // Critical files must be present
@@ -66,10 +67,11 @@ test("npm pack produces tarball with required files", async () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("tarball installs and gsd binary resolves", async () => {
-  // Pack (assumes build already done)
-  const packOutput = execSync("npm pack --json 2>/dev/null", {
+  // Pack (build already done by test:integration script)
+  const packOutput = execFileSync("npm", ["pack", "--json"], {
     cwd: projectRoot,
     encoding: "utf-8",
+    stdio: ["ignore", "pipe", "ignore"],
   });
   const packInfo = JSON.parse(packOutput);
   const tarball = packInfo[0].filename;
@@ -79,9 +81,10 @@ test("tarball installs and gsd binary resolves", async () => {
 
   try {
     // Install from tarball into a temp prefix
-    execSync(`npm install --prefix ${tmp} ${tarballPath} --no-save 2>&1`, {
+    execFileSync("npm", ["install", "--prefix", tmp, tarballPath, "--no-save"], {
       encoding: "utf-8",
       env: { ...process.env, PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
     });
 
     // Verify the gsd bin exists in the installed package

@@ -15,7 +15,7 @@ const https = require('https');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { execSync, spawn } = require('child_process');
+const { execSync, execFileSync, spawn } = require('child_process');
 const os = require('os');
 const { pipeline } = require('stream');
 const { createGunzip } = require('zlib');
@@ -243,6 +243,16 @@ function parseVersion(versionStr) {
   return cleaned.split('.').map((part) => parseInt(part, 10) || 0);
 }
 
+function compareVersions(a, b) {
+  const pa = parseVersion(a);
+  const pb = parseVersion(b);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] || 0) - (pb[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
 function getInstalledVersion() {
   try {
     const result = execSync('gh --version', { encoding: 'utf-8', timeout: 5000 });
@@ -279,15 +289,17 @@ async function extractBinary(archivePath, osKey) {
       cwd: extractDir,
       stripComponents: 1,
     });
+  } else if (process.platform === 'darwin') {
+    // macOS ships with unzip — use execFileSync to avoid shell parsing
+    execFileSync('unzip', ['-q', archivePath, '-d', extractDir], { stdio: 'pipe' });
+  } else if (process.platform === 'win32') {
+    // Windows: use PowerShell's built-in Expand-Archive (no external tools required)
+    execFileSync('powershell.exe', [
+      '-NoProfile', '-Command',
+      `Expand-Archive -LiteralPath '${archivePath}' -DestinationPath '${extractDir}' -Force`,
+    ], { stdio: 'pipe' });
   } else {
-    // For zip files, use system unzip or adm-zip
-    // Fallback to using tar which can handle zip on some systems
-    try {
-      execSync(`unzip -q "${archivePath}" -d "${extractDir}"`, { stdio: 'pipe' });
-    } catch {
-      // Try with tar (macOS/BSD can handle zip)
-      execSync(`tar -xf "${archivePath}" -C "${extractDir}"`, { stdio: 'pipe' });
-    }
+    throw new Error(`Unsupported platform for ZIP extraction: ${process.platform}`);
   }
 
   // Find the binary
@@ -395,7 +407,7 @@ async function main() {
   // 7. Check if update is needed
   const needsUpdate =
     !installedVersion ||
-    parseVersion(installedVersion) < parseVersion(latestVersion);
+    compareVersions(installedVersion, latestVersion) < 0;
 
   if (!needsUpdate && !force) {
     console.log('✅ gh is already up to date');
