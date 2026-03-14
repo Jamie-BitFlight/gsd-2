@@ -20,20 +20,21 @@ import tar from "tar";
 
 const projectRoot = process.cwd();
 
+function packTarball(): string {
+  const out = execFileSync("npm", ["pack", "--json"], {
+    cwd: projectRoot,
+    encoding: "utf-8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  return join(projectRoot, JSON.parse(out)[0].filename);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. npm pack produces valid tarball with correct file layout
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("npm pack produces tarball with required files", async () => {
-  // Pack (build already done by test:integration script)
-  const packOutput = execFileSync("npm", ["pack", "--json"], {
-    cwd: projectRoot,
-    encoding: "utf-8",
-    stdio: ["ignore", "pipe", "ignore"],
-  });
-  const packInfo = JSON.parse(packOutput);
-  const tarball = packInfo[0].filename;
-  const tarballPath = join(projectRoot, tarball);
+  const tarballPath = packTarball();
 
   assert.ok(existsSync(tarballPath), `tarball ${tarball} created`);
 
@@ -41,7 +42,6 @@ test("npm pack produces tarball with required files", async () => {
     // List tarball contents
     const files: string[] = [];
     await tar.t({ file: tarballPath, onentry: (entry: any) => files.push(entry.path) });
-    const contents = files.join("\n");
 
     // Critical files must be present
     assert.ok(files.some(f => f.includes("dist/loader.js")), "tarball contains dist/loader.js");
@@ -69,15 +69,7 @@ test("npm pack produces tarball with required files", async () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 test("tarball installs and gsd binary resolves", async () => {
-  // Pack (build already done by test:integration script)
-  const packOutput = execFileSync("npm", ["pack", "--json"], {
-    cwd: projectRoot,
-    encoding: "utf-8",
-    stdio: ["ignore", "pipe", "ignore"],
-  });
-  const packInfo = JSON.parse(packOutput);
-  const tarball = packInfo[0].filename;
-  const tarballPath = join(projectRoot, tarball);
+  const tarballPath = packTarball();
 
   const tmp = mkdtempSync(join(tmpdir(), "gsd-install-test-"));
 

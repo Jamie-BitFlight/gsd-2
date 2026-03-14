@@ -22,7 +22,8 @@ const cliRepo = (() => {
   const i = a.findIndex(x => x === '--repo' || x === '-R');
   return i >= 0 && a[i + 1] ? a[i + 1] : null;
 })();
-const getRepo = () => cliRepo || process.env.GITHUB_REPOSITORY || ghJson(['repo', 'view', '--json', 'nameWithOwner']).nameWithOwner;
+let _repo = null;
+const getRepo = () => _repo || (_repo = cliRepo || process.env.GITHUB_REPOSITORY || ghJson(['repo', 'view', '--json', 'nameWithOwner']).nameWithOwner);
 const runView = (id, f = 'status,conclusion,jobs') => ghJson(['run', 'view', String(id), '--repo', getRepo(), '--json', f]);
 const runList = (opts = {}) => {
   const args = ['run', 'list', '--repo', getRepo(), '--limit', String(opts.limit || 10),
