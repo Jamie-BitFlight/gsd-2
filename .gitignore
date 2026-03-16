@@ -55,6 +55,21 @@ docs/coherence-audit/
 # ── GSD project state (per-worktree, never committed) ──
 .gsd/
 
+# ── GSD baseline (auto-generated, kept explicit for older branches/tooling) ──
+.gsd/activity/
+.gsd/runtime/
+.gsd/worktrees/
+.gsd/auto.lock
+.gsd/metrics.json
+.gsd/completed-units.json
+.gsd/STATE.md
+.gsd/gsd.db
+.gsd/DISCUSSION-MANIFEST.json
+.gsd/milestones/**/*-CONTINUE.md
+.gsd/milestones/**/continue.md
+.gsd/forensics/
+.gsd/parallel/
+
 # ── Stale lock files (npm is canonical) ──
 pnpm-lock.yaml
 bun.lock

@@ -510,46 +510,46 @@ This file is the explicit capability and coverage contract for the project.
 
 ### R060 — Evidence Classification in Research Phase
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Research prompts produce an unknowns inventory where every implementation-affecting claim is classified by evidence basis (observed, training-data, inferred, assumption, unknown). Each non-observed claim has a typed resolution path (check-docs, read-code, experiment, ask-user, fetch-reference, search). Training data recall is explicitly classified as unverified.
 - Why it matters: Without evidence classification, training-data recall is treated as fact. The agent states `actions/checkout@v4` with confidence and it's wrong. The unknowns inventory makes the gap visible and gives it a resolution path. This addresses the [process gap failure mode](https://github.com/bitflight-devops/stateless-agent-methodology/blob/main/research/arl/README.md#the-hallucination-pivot-point) from ARL research.
 - Source: user, informed by [hallucination-detector](https://github.com/bitflight-devops/hallucination-detector) evidence classification and [ARL R1 Information Completeness gate](https://github.com/bitflight-devops/stateless-agent-methodology/blob/main/research/arl/README.md#the-10-gates)
 - Primary owning slice: M005-8pv12q/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: templates/research.md has Unknowns Inventory section with evidence basis classification. research-milestone.md and research-slice.md step 7 instruct researchers to classify implementation-affecting claims. Delivered in commit 01059a8.
 - Notes: Research output template gains `## Unknowns Inventory` section. Research prompts gain evidence classification instructions.
 
 ### R061 — Unknowns-Driven Task Planning
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Plan prompts read the unknowns inventory from research and build resolution steps into task plans. Each unresolved unknown becomes a concrete step. When an unknown is resolved, its impact on existing assumptions is validated before proceeding.
 - Why it matters: The planner is where unknowns become actionable. Without this, the unknowns inventory is information that goes nowhere. With it, a task with 20 unknowns naturally gets 20 resolution steps — same pipeline, longer list.
 - Source: user, informed by [planner-rt-ica skill](https://github.com/Jamie-BitFlight/claude_skills/tree/main/plugins/development-harness/skills/planner-rt-ica)
 - Primary owning slice: M005-8pv12q/S02
 - Supporting slices: M005-8pv12q/S01
-- Validation: unmapped
+- Validation: plan-slice.md step 6 and plan-milestone.md step 6 convert unresolved unknowns to concrete resolution steps; prohibition on silently dropping them is explicit. Delivered in commit 01059a8.
 - Notes: Plan prompt changes. Tasks gain resolution steps. Impact validation: resolved unknowns checked against existing assumptions.
 
 ### R062 — Verification Protocol in Execution
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Execute-task prompt contains a verification protocol: before acting on an inferred or training-data claim, verify it first. The executor names the claim, checks if it's observed, and if not — verifies before proceeding. Bug-fix tasks additionally follow reproduce → define success → apply → verify.
 - Why it matters: Execution is where unverified claims become committed code. The verification protocol catches training-data assumptions at the last moment before they become implementation. Informed by [verification-gate skill](https://github.com/Jamie-BitFlight/claude_skills/tree/main/plugins/verification-gate/skills/verification-gate) and [validation-protocol skill](https://github.com/Jamie-BitFlight/claude_skills/tree/main/plugins/development-harness/skills/validation-protocol).
 - Source: user, informed by [ARL Principle 1: Structure Over Instruction](https://github.com/bitflight-devops/stateless-agent-methodology/blob/main/autonomous-loop-principles.md#principle-1-structure-over-instruction)
 - Primary owning slice: M005-8pv12q/S03
 - Supporting slices: M005-8pv12q/S02
-- Validation: unmapped
+- Validation: execute-task.md step 3 (evidence check before acting) and step 4 (bug-fix protocol) present as numbered execution steps. Delivered in commit 01059a8.
 - Notes: Execute-task prompt changes. Verification is part of execution flow, not a separate ceremony.
 
 ### R063 — Resolution Verification at Completion
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Complete-slice prompt checks that all unknowns from the plan are resolved with evidence. Reports which claims moved from unverified to observed. Reports any items that remain unresolved.
 - Why it matters: Completion is the accountability gate. Without it, unknowns can be silently dropped. With it, the completer explicitly confirms the knowledge set is complete.
 - Source: user
 - Primary owning slice: M005-8pv12q/S04
 - Supporting slices: M005-8pv12q/S02
-- Validation: unmapped
+- Validation: complete-slice.md step 6 checks unknowns resolution status, reports N/M count, notes REFUTED adjustments, flags unresolved items. Delivered in commit 01059a8.
 - Notes: Complete-slice prompt changes. Structural: if unknowns existed in the plan, report their resolution status.
 
 ## Deferred
@@ -716,10 +716,10 @@ This file is the explicit capability and coverage contract for the project.
 | R055 | core-capability | active | M004/S06 | M004/S03 | unmapped |
 | R056 | operability | active | M004/S06 | M004/S01 | unmapped |
 | R057 | quality-attribute | active | M004/S07 | M004/S03, M004/S04 | unmapped |
-| R060 | core-capability | active | M005-8pv12q/S01 | none | unmapped |
-| R061 | core-capability | active | M005-8pv12q/S02 | M005-8pv12q/S01 | unmapped |
-| R062 | core-capability | active | M005-8pv12q/S03 | M005-8pv12q/S02 | unmapped |
-| R063 | core-capability | active | M005-8pv12q/S04 | M005-8pv12q/S02 | unmapped |
+| R060 | core-capability | validated | M005-8pv12q/S01 | none | templates/research.md Unknowns Inventory section; research prompts step 7 |
+| R061 | core-capability | validated | M005-8pv12q/S02 | M005-8pv12q/S01 | plan-slice.md and plan-milestone.md step 6 |
+| R062 | core-capability | validated | M005-8pv12q/S03 | M005-8pv12q/S02 | execute-task.md steps 3 and 4 |
+| R063 | core-capability | validated | M005-8pv12q/S04 | M005-8pv12q/S02 | complete-slice.md step 6 |
 
 ## Coverage Summary
 
