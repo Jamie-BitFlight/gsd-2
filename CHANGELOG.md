@@ -6,6 +6,25 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.21.0] - 2026-03-16
+
+### Added
+- **Browser tools TypeScript conversion** — `browser-tools/core.js` converted to TypeScript with c8 test coverage
+- **SSRF protection on `fetch_page`** — blocks private IPs, metadata endpoints, and non-HTTP protocols
+- **Stale async job cancellation** — heuristic prevents outdated results in auto-mode
+
+### Changed
+- **Pause/resume recovery** — reuses crash recovery infrastructure for more reliable context restoration
+- **Build scripts extracted** — inline package.json scripts moved to standalone files for cross-platform support
+- **Help text deduplicated** — consolidated across CLI entry points
+- **Dependency alignment** — `@types/mime-types` moved to devDependencies, chalk versions consolidated
+
+### Fixed
+- Task counter display no longer shows "task 5/4" after loop recovery
+- Browser-tools TypeScript type errors in CI
+- 4 small issues (#663): Windows GitHub Copilot login, Tavily display, MCPorter auto-install, notification preferences
+- Cross-platform `validate-pack` script compatibility
+
 ## [2.20.0] - 2026-03-16
 
 ### Added
@@ -809,7 +828,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - License updated to MIT
 
-[Unreleased]: https://github.com/gsd-build/gsd-2/compare/v2.20.0...HEAD
+[Unreleased]: https://github.com/gsd-build/gsd-2/compare/v2.21.0...HEAD
+[2.21.0]: https://github.com/gsd-build/gsd-2/compare/v2.20.0...v2.21.0
 [2.19.0]: https://github.com/gsd-build/gsd-2/compare/v2.18.0...v2.19.0
 [2.18.0]: https://github.com/gsd-build/gsd-2/compare/v2.17.0...v2.18.0
 [2.17.0]: https://github.com/gsd-build/gsd-2/compare/v2.16.0...v2.17.0
