@@ -147,7 +147,104 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Memory-db proved: 52.2% plan-slice, 66.3% decisions-only, 32.2% research composite, 42.4% lifecycle. Must re-prove against current codebase.
 
-## Validated
+### R064 — Fact-check coordinator after research units
+- Class: core-capability
+- Status: active
+- Description: After `research-milestone` and `research-slice` units complete, a fact-check coordinator evaluates unresolved verifiable claims and initiates independent verification work.
+- Why it matters: M005-8pv12q only made claims visible. Without a coordinator, the same planning inputs still flow forward unverified.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S02
+- Supporting slices: M006-tbhsp8/S01
+- Validation: mapped
+- Notes: Coordinator should be implemented as a dedicated hook agent rather than a long inline hook prompt.
+
+### R065 — Durable per-claim annotation files
+- Class: core-capability
+- Status: active
+- Description: Each verified claim produces a durable annotation file containing the claim ID, verdict, evidence, citations, corrected value when refuted, and impact classification.
+- Why it matters: Refutations need a durable evidence trail that later planners, executors, and completers can inspect rather than relying on ephemeral session state.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S01
+- Supporting slices: M006-tbhsp8/S02
+- Validation: mapped
+- Notes: Per-claim annotations are the evidence record; they should not double as the runtime control artifact.
+
+### R066 — Aggregate fact-check runtime status artifact
+- Class: integration
+- Status: active
+- Description: Fact-check outcomes are summarized into a machine-readable aggregate status artifact that the runtime can inspect for routing and cycle control.
+- Why it matters: The runtime needs a deterministic control surface. Scattered per-claim files are not enough for planner reinvocation decisions.
+- Source: inferred
+- Primary owning slice: M006-tbhsp8/S01
+- Supporting slices: M006-tbhsp8/S02, M006-tbhsp8/S04
+- Validation: mapped
+- Notes: JSON should be the source of truth; add a markdown mirror later only if debugging proves it necessary.
+
+### R067 — Configurable scout execution path
+- Class: operability
+- Status: active
+- Description: Scout execution is configurable through preferences and agent selection rather than hardcoded to a specific model family.
+- Why it matters: The user explicitly does not want "haiku scouts" hardcoded. The verification path should adapt to available agents/models and future tuning.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S02
+- Supporting slices: none
+- Validation: mapped
+- Notes: Existing `models.subagent` preference should be reused unless a dedicated fact-check model phase proves necessary later.
+
+### R068 — Planner evidence ingestion from fact-check outputs
+- Class: core-capability
+- Status: active
+- Description: Planner prompt assembly includes aggregate fact-check status and relevant REFUTED claim annotations so corrected evidence becomes a direct planning input.
+- Why it matters: Evidence that never reaches the planner cannot change the plan. This is where corrected facts become actionable.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S03
+- Supporting slices: M006-tbhsp8/S01, M006-tbhsp8/S02
+- Validation: mapped
+- Notes: Planning context should include aggregate status plus only the necessary REFUTED claims to control prompt size.
+
+### R069 — Bounded planner reinvocation on plan-impacting refutations
+- Class: core-capability
+- Status: active
+- Description: REFUTED claims marked as slice- or milestone-impacting trigger planner reinvocation with corrected evidence before execution proceeds, bounded by a configured cycle limit.
+- Why it matters: Advisory refutations are not enough. The planner must get another turn when corrected facts change planning inputs.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S04
+- Supporting slices: M006-tbhsp8/S03
+- Validation: mapped
+- Notes: This is real runtime behavior, not a prompt suggestion.
+
+### R070 — Deterministic revision routing by impact scope
+- Class: integration
+- Status: active
+- Description: Revision routing is explicit: pre-execution fact-check corrections rerun `plan-slice` or `plan-milestone` by impact scope, while `replan-slice` remains reserved for execution-discovered blockers.
+- Why it matters: Overloading `replan-slice` would blur two different workflows and make the control loop harder to reason about and debug.
+- Source: inferred
+- Primary owning slice: M006-tbhsp8/S04
+- Supporting slices: M006-tbhsp8/S01
+- Validation: mapped
+- Notes: Preserve existing semantics of `replan-slice` as blocker-driven recovery.
+
+### R071 — Completion reporting for fact-check outcomes
+- Class: failure-visibility
+- Status: active
+- Description: Slice and milestone completion summaries report claims checked, verdict counts, revision cycles, unresolved inconclusive claims, and whether corrected facts were absorbed before execution.
+- Why it matters: The user wants to review how this behaves in the real world. Completion artifacts need to show whether the loop actually worked.
+- Source: user
+- Primary owning slice: M006-tbhsp8/S05
+- Supporting slices: M006-tbhsp8/S04
+- Validation: mapped
+- Notes: This is part of the observability needed before telemetry/experiments in later milestones.
+
+### R072 — Deterministic planner outputs for lower-end workers
+- Class: quality-attribute
+- Status: active
+- Description: Planner artifacts for runtime-control milestones explicitly name actors, observable triggers, decision conditions, state-changing outputs, feedback loops, and terminal states so lower-end worker agents can execute them without interpretation.
+- Why it matters: Vague control prose creates wiggle room that weaker worker models will interpret inconsistently. The planner must remove that ambiguity structurally.
+- Source: inferred
+- Primary owning slice: M006-tbhsp8/S01
+- Supporting slices: M006-tbhsp8/S03
+- Validation: mapped
+- Notes: Folded in from process-design discussion; this is a durable planning rule, not just a style preference.
 
 ### R029 — Auto-worktree creation on milestone start
 - Class: core-capability
@@ -609,6 +706,28 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Deferred — execSync writes are functional. Optimize later if profiling shows it matters.
 
+### R073 — Fact-check prioritization and ranking
+- Class: operability
+- Status: deferred
+- Description: Prioritize which unresolved claims get verified first based on risk, likely impact, or verification cost.
+- Why it matters: Useful once the basic correction loop exists, but not necessary for the first structurally correct version.
+- Source: inferred
+- Primary owning slice: none
+- Supporting slices: none
+- Validation: unmapped
+- Notes: Defer until real-world usage shows verification cost or latency problems.
+
+### R074 — Dedicated fact-check model phase
+- Class: operability
+- Status: deferred
+- Description: Add a first-class `models.factcheck` preference instead of reusing hook `model` plus `models.subagent` for coordinator/scout execution.
+- Why it matters: Could improve tuning and separation of concerns later, but existing model-routing surfaces are enough for the first version.
+- Source: inferred
+- Primary owning slice: none
+- Supporting slices: none
+- Validation: unmapped
+- Notes: Defer unless configuration pressure proves current model-routing surfaces insufficient.
+
 ## Out of Scope
 
 ### R013 — Curated service knowledge base
@@ -654,6 +773,28 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: none
 - Validation: n/a
 - Notes: --no-ff merge + squash covers all needed use cases without history rewriting.
+
+### R075 — Telemetry and experiment harness inside M006
+- Class: anti-feature
+- Status: out-of-scope
+- Description: Add telemetry, experiment fixtures, baseline comparison harness, or outcome analysis directly inside M006.
+- Why it matters: Prevents M006 from ballooning into M007/M008 work before the correction loop itself exists.
+- Source: inferred
+- Primary owning slice: none
+- Supporting slices: none
+- Validation: n/a
+- Notes: Observation and experiments belong to later milestones.
+
+### R076 — Public reporting and publication workflow in M006
+- Class: anti-feature
+- Status: out-of-scope
+- Description: Write the public report, reproducibility package, or publication workflow as part of M006.
+- Why it matters: Keeps M006 focused on building the runtime system rather than documenting future results.
+- Source: inferred
+- Primary owning slice: none
+- Supporting slices: none
+- Validation: n/a
+- Notes: This belongs to M009.
 
 ## Traceability
 
@@ -720,12 +861,25 @@ This file is the explicit capability and coverage contract for the project.
 | R061 | core-capability | validated | M005-8pv12q/S02 | M005-8pv12q/S01 | plan-slice.md and plan-milestone.md step 6 |
 | R062 | core-capability | validated | M005-8pv12q/S03 | M005-8pv12q/S02 | execute-task.md steps 3 and 4 |
 | R063 | core-capability | validated | M005-8pv12q/S04 | M005-8pv12q/S02 | complete-slice.md step 6 |
+| R064 | core-capability | active | M006-tbhsp8/S02 | M006-tbhsp8/S01 | mapped |
+| R065 | core-capability | active | M006-tbhsp8/S01 | M006-tbhsp8/S02 | mapped |
+| R066 | integration | active | M006-tbhsp8/S01 | M006-tbhsp8/S02, M006-tbhsp8/S04 | mapped |
+| R067 | operability | active | M006-tbhsp8/S02 | none | mapped |
+| R068 | core-capability | active | M006-tbhsp8/S03 | M006-tbhsp8/S01, M006-tbhsp8/S02 | mapped |
+| R069 | core-capability | active | M006-tbhsp8/S04 | M006-tbhsp8/S03 | mapped |
+| R070 | integration | active | M006-tbhsp8/S04 | M006-tbhsp8/S01 | mapped |
+| R071 | failure-visibility | active | M006-tbhsp8/S05 | M006-tbhsp8/S04 | mapped |
+| R072 | quality-attribute | active | M006-tbhsp8/S01 | M006-tbhsp8/S03 | mapped |
+| R073 | operability | deferred | none | none | unmapped |
+| R074 | operability | deferred | none | none | unmapped |
+| R075 | anti-feature | out-of-scope | none | none | n/a |
+| R076 | anti-feature | out-of-scope | none | none | n/a |
 
 ## Coverage Summary
 
-- Active requirements: 17
-- Mapped to slices: 17
+- Active requirements: 26
+- Mapped to slices: 26
 - Validated: 35
-- Deferred: 5
-- Out of scope: 4
+- Deferred: 7
+- Out of scope: 6
 - Unmapped active requirements: 0
