@@ -51,3 +51,4 @@ See `.gsd/REQUIREMENTS.md` for the explicit capability contract, requirement sta
 - [ ] M007: Telemetry, Metrics, and Experiment Fixtures — Observation surfaces, fixture packs, and comparison harness for evidence-grounded GSD
 - [ ] M008: Controlled Experiment and Iteration — Baseline vs treatment runs, bounded revision loop, and measured outcome analysis
 - [ ] M009: Report, Document, Publish — Writeup, reproducibility artifacts, and public documentation for the full evidence-grounded arc
+- [ ] M010: Recovery and Doctor State Regression Hardening — Prevent recovery/doctor from fabricating earlier milestones or regressing active milestone selection when repairing damaged .gsd state

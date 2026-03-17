@@ -115,3 +115,48 @@
 - Public writeup
 
 **Success looks like:** Independently reproducible. Tagged Docker images, published fixtures, documented methodology. ARL evidence ledger has empirical entries.
+
+---
+
+## M010: Recovery and Doctor State Regression Hardening
+
+**Queued:** 2026-03-17
+**Depends on:** M009
+
+**Brief:** Fix the state-recovery and doctor flows so repairing damaged `.gsd/` state cannot fabricate or promote earlier milestone IDs, cannot regress the active milestone away from the real branch/worktree lineage, and cannot harden that regression into `STATE.md`.
+
+**Why:** During live use, a damaged `STATE.md` led to repeated advice to run doctor. Doctor/recovery then reconstructed incorrect earlier milestones (`M001`, later `M002`) instead of preserving the active M005 arc. Those fabricated milestone directories became authoritative inputs to `deriveState()`, which then redirected `/gsd auto` into the wrong work. This is not just stale cache — it is a structural recovery bug that can derail in-flight milestone work.
+
+**Observed evidence:**
+- `STATE.md` drifted and told the user to run doctor.
+- After doctor-based repair, fabricated milestone dirs for earlier sequence IDs appeared and became active milestones.
+- Queue order and milestone discovery then prioritized those fabricated milestones.
+- `deriveState()` followed disk state faithfully, so doctor rebuilt `STATE.md` to match the wrong milestone.
+- The user lost time working regenerated milestone paths that were already completed remotely.
+
+**Primary failure modes to address:**
+- Recovery/doctor can create or preserve metadata-only milestone dirs that `findMilestoneIds()` later treats as real milestones.
+- `deriveState()` milestone discovery trusts bare directories and queue order more than active milestone lineage.
+- Doctor rebuilds `STATE.md` from `deriveState()` without guarding against regression to earlier fabricated milestones.
+- Recovery is not anchored strongly enough to current branch/worktree/integration-branch lineage when deciding what milestone is active.
+
+**Deliverables:**
+- Milestone discovery hardening so metadata-only or repair-skeleton milestone dirs do not become active milestones.
+- Doctor guardrails that detect milestone regression during repair and refuse to harden it silently.
+- Recovery precedence rules favoring real active milestone lineage (branch/worktree/integration branch, real roadmap/context/summary artifacts) over sequence-only reconstruction.
+- Explicit diagnostics for ghost/fabricated milestones and stale queue-order interactions.
+- Regression tests covering the real user incident: damaged state on M005, doctor run, no fabricated M001/M002 takeover.
+
+**Success looks like:** With damaged `STATE.md` and incomplete recovery artifacts, doctor can rebuild state without inventing earlier milestones; `/gsd auto` resumes the intended active arc; ghost milestone dirs are flagged or ignored rather than promoted.
+
+**Recommended slice themes:**
+- **S01:** Incident fixture + regression test harness for fabricated-milestone takeover
+- **S02:** Milestone discovery hardening (`findMilestoneIds` / `deriveState` eligibility rules)
+- **S03:** Doctor repair guardrails and ghost-milestone diagnostics
+- **S04:** Active-lineage-aware recovery (worktree/branch/meta precedence)
+- **S05:** End-to-end verification for doctor → auto resume on damaged state
+
+**Non-goals:**
+- Redesigning the broader milestone model
+- Queue UX improvements unrelated to recovery correctness
+- Experiment/telemetry work already covered by M007–M009
