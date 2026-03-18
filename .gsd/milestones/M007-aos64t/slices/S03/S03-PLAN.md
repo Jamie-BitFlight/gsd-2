@@ -37,7 +37,7 @@
   - Verify: `node --test src/resources/extensions/gsd/tests/factcheck-final-audit.test.ts`
   - Done when: Test passes, `M007-VALIDATION-REPORT.json` exists with valid schema and result=PASS
 
-- [ ] **T02: Validate report schema and run full proof suite** `est:15m`
+- [x] **T02: Validate report schema and run full proof suite** `est:15m`
   - Why: Confirms the validation report is machine-parseable for future milestone closeout, and that all proof tests (S01 fixture, S02 live, S03 audit) pass together.
   - Files: `src/resources/extensions/gsd/tests/factcheck-final-audit.test.ts` (read-only verification)
   - Do: (1) Run all three factcheck test files together to confirm no regressions. (2) Read the generated `M007-VALIDATION-REPORT.json` and assert it has all required top-level keys and evidence sub-keys. (3) Verify the report's `result` field is "PASS". (4) Verify the report's `evidence.correctedValuePresent` is true and `evidence.refutedCount` >= 1.
