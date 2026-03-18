@@ -51,7 +51,7 @@ This milestone is complete only when all are true:
   > After this: A controlled proof fixture can drive the real fact-check runtime path with known refutation inputs and stable expected outputs.
 - [x] **S02: Live Reroute Proof Run** `risk:high` `depends:[S01]`
   > After this: The assembled runtime path proves coordinator artifact writing, planner reroute, and corrected evidence injection in one live scenario.
-- [ ] **S03: Durable Validation and Closeout** `risk:medium` `depends:[S02]`
+- [x] **S03: Durable Validation and Closeout** `risk:medium` `depends:[S02]`
   > After this: The proof flow writes durable validation artifacts and milestone closeout can pass on repeatable live evidence instead of test-only inference.
 
 ## Boundary Map
