@@ -49,7 +49,7 @@
   - Verify: `npx tsc --noEmit` passes with zero errors
   - Done when: All five type definitions export from `types.ts`, `factcheck.ts` exports path-resolution and derivation functions, and the module compiles cleanly.
 
-- [ ] **T02: Implement annotation/status parsers and contract verification tests** `est:1h`
+- [x] **T02: Implement annotation/status parsers and contract verification tests** `est:1h`
   - Why: The contract is only real if it round-trips through serialization. Tests prove the schema is stable and machine-checkable, retiring the "artifact contract ambiguity" risk from the roadmap. Covers R065 (annotation durability), R066 (aggregate status machine-readability).
   - Files: `src/resources/extensions/gsd/factcheck.ts`, `src/resources/extensions/gsd/tests/factcheck.test.ts`
   - Do: In `factcheck.ts`, implement `formatAnnotation` / `parseAnnotation` (JSON serialize/deserialize with validation), `formatAggregateStatus` / `parseAggregateStatus` (JSON serialize/deserialize, auto-derives `overallStatus` and `planImpacting` from claim list), and `buildAggregateStatus` (takes annotation array + cycle info, produces complete status object). In `tests/factcheck.test.ts`, write vitest tests: (1) annotation round-trip for each verdict×impact combination, (2) aggregate status round-trip with plan-impacting derivation, (3) `buildAggregateStatus` correctly counts verdicts and sets flags, (4) path-resolution functions produce `<slicePath>/factcheck/claims/<id>.json` and `<slicePath>/factcheck/FACTCHECK-STATUS.json`, (5) edge cases: empty annotation list → `clean` status, cycle at max → `exhausted` status, missing optional `correctedValue` field.

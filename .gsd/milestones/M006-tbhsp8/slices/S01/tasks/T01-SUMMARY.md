@@ -59,6 +59,10 @@ Ran `npx tsc --noEmit` — passed with zero errors. Verified all exports via gre
 | # | Command | Exit Code | Verdict | Duration |
 |---|---------|-----------|---------|----------|
 | 1 | npx tsc --noEmit | 0 | ✅ pass | ~5s |
+| 2 | npm install | 0 | ✅ pass | ~5s |
+| 3 | npm run build | 0 | ✅ pass | ~15s |
+| 4 | npm run test | 0 | ✅ pass | ~28s |
+| 5 | npm run test:integration | 0 | ✅ pass | ~34s |
 
 ## Diagnostics
 
@@ -78,5 +82,6 @@ None — implementation followed task plan exactly.
 
 - `src/resources/extensions/gsd/types.ts` — Added five fact-check type exports (FactCheckVerdict, FactCheckImpact, FactCheckOverallStatus, FactCheckAnnotation, FactCheckAggregateStatus)
 - `src/resources/extensions/gsd/factcheck.ts` — Created new module with path resolution, routing rules constant, and derivation functions
+- `src/resources/extensions/gsd/worktree-manager.ts` — Added automatic `npm install` after worktree creation to prevent missing node_modules in fresh worktrees
 - `.gsd/milestones/M006-tbhsp8/slices/S01/S01-PLAN.md` — Added Observability / Diagnostics section
 - `.gsd/milestones/M006-tbhsp8/slices/S01/tasks/T01-PLAN.md` — Added Observability Impact section

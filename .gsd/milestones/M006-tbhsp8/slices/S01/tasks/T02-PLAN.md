@@ -52,3 +52,11 @@ Add serialization functions and a comprehensive test suite that proves the fact-
 
 - `src/resources/extensions/gsd/factcheck.ts` — extended with format/parse/build functions
 - `src/resources/extensions/gsd/tests/factcheck.test.ts` — new test file, all tests green
+
+## Observability Impact
+
+This task adds pure parsing/serialization functions - no runtime signals, no async flows, no background processes.
+
+- Signals added/changed: N/A (pure functions, no I/O)
+- How a future agent inspects this: Run `npx tsc --noEmit` to verify types compile; run tests with `node --test src/resources/extensions/gsd/tests/factcheck.test.ts`
+- Failure state exposed: TypeScript compile errors appear immediately; test failures show which verdict/impact combinations fail round-trip or which validations don't throw as expected

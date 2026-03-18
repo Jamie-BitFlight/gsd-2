@@ -118,6 +118,19 @@
 
 ---
 
+## M007-aos64t: Live Runtime Proof for Fact-Check Loop
+
+**Queued:** 2026-03-18
+**Depends on:** M006-tbhsp8
+
+**Brief:** Build the missing operational proof for the M006 fact-check service layer by running a deterministic live runtime scenario through the real auto-mode path. The proof must show research-triggered fact-checking writes durable artifacts, the dispatcher reroutes planning on a plan-impacting refutation, and the reinvoked planner receives corrected evidence before stale execution continues.
+
+**Why:** M006 is requirement-complete and test-complete, but its milestone closeout failed because the roadmap explicitly required a live runtime re-check. Without this proof, later telemetry and experiment milestones would be measuring a loop that has never been demonstrated end-to-end in the actual runtime path.
+
+**Success looks like:** One repeatable proof flow exercises the real hook, dispatcher, and prompt assembly path; writes durable validation artifacts; and lets a future agent confirm the correction loop worked without reconstructing the session from logs.
+
+---
+
 ## M010: Recovery and Doctor State Regression Hardening
 
 **Queued:** 2026-03-17

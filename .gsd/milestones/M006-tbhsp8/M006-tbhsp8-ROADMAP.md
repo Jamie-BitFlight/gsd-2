@@ -50,16 +50,18 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Fact-Check Control Contract** `risk:high` `depends:[]`
-  > After this: The project has a concrete fact-check contract — per-claim annotation schema, aggregate JSON status artifact, impact enum, cycle key, and routing rules are defined clearly enough for runtime and planners to consume without interpretation.
-- [ ] **S02: Coordinator and Scout Execution** `risk:high` `depends:[S01]`
-  > After this: A research unit with unresolved claims triggers coordinator execution, scouts verify those claims through a configurable agent/model path, and durable annotations plus aggregate status appear on disk.
-- [ ] **S03: Planner Evidence Ingestion** `risk:medium` `depends:[S01,S02]`
+- [x] **S01: Fact-Check Control Contract** `risk:high` `depends:[]`
+  > After this: The project has a concrete fact-check contract — per-claim annotation schema, aggregate JSON status artifact, impact enum, cycle key, and routing rules are defined clearly enough for runtime and planners to consume without interpretation. **COMPLETE** — contract proven via 37 passing tests and tsc --noEmit.
+- [x] **S02: Coordinator and Scout Execution** `risk:high` `depends:[S01]`
+  > After this: A research unit with unresolved claims triggers coordinator execution, scouts verify those claims through a configurable agent/model path, and durable annotations plus aggregate status appear on disk. **COMPLETE** — 25 integration tests pass, default hook wired for research-* units.
+- [x] **S03: Planner Evidence Ingestion** `risk:medium` `depends:[S01,S02]`
   > After this: Planning prompts include fact-check outputs, and REFUTED claims with corrected values show up in planning context as concrete planning inputs rather than side-channel notes.
-- [ ] **S04: Bounded Planner Revision Loop** `risk:high` `depends:[S02,S03]`
-  > After this: A slice- or milestone-impacting REFUTED claim causes auto-mode to rerun the correct planning unit with corrected evidence, capped at 2 cycles with explicit blocker behavior on exhaustion.
-- [ ] **S05: Completion Reporting and Diagnostics** `risk:low` `depends:[S04]`
-  > After this: Slice and milestone summaries report verdict counts, revision cycles, unresolved inconclusive claims, and whether corrected facts were successfully absorbed before execution.
+- [x] **S04: Bounded Planner Revision Loop** `risk:high` `depends:[S02,S03]`
+  > After this: A slice- or milestone-impacting REFUTED claim causes auto-mode to rerun the correct planning unit with corrected evidence, capped at 2 cycles with explicit blocker behavior on exhaustion. **COMPLETE** — 11 integration tests pass, dispatch rule wired for plan-impacting refutations.
+- [x] **S05: Completion Reporting and Diagnostics** `risk:low` `depends:[S04]`
+  > After this: Slice and milestone summaries report verdict counts, revision cycles, unresolved inconclusive claims, and whether corrected facts were successfully absorbed before execution. **COMPLETE** — 10 unit tests pass, tsc --noEmit clean, prompt wiring verified.
+- [x] **S06: Milestone Planner Fact-Check Ingestion** `risk:medium` `depends:[S03,S04]`
+  > After this: `plan-milestone` consumes aggregate fact-check status and milestone-impact REFUTED claim annotations, so milestone-level reroutes are reinvoked with corrected evidence and the end-to-end correction loop is proven for both reroute targets. **COMPLETE** — 13 integration tests pass, tsc --noEmit clean, milestone and slice reroute targets both proven.
 
 ## Boundary Map
 
