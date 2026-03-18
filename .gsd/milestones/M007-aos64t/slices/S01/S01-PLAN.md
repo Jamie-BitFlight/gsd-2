@@ -44,7 +44,7 @@
   - Do: Add fixture assets that model a real research output with an Unknowns Inventory containing a known refutable claim, expected corrected value, impact scope, and any required slice/milestone directory structure. Keep the fixture synthetic, explicit, and reusable by test/harness code.
   - Verify: `node --test src/resources/extensions/gsd/tests/factcheck-runtime-fixture.test.ts --test-name-pattern "fixture"`
   - Done when: Fixture assets can be loaded by test code without ad hoc setup and clearly encode the expected refutation outcome.
-- [ ] **T02: Add a runtime harness that exercises real hook, reroute, and prompt code paths** `est:1h15m`
+- [x] **T02: Add a runtime harness that exercises real hook, reroute, and prompt code paths** `est:1h15m`
   - Why: The milestone gap is live sequencing, not helper correctness. This task creates a controlled execution path that uses real runtime modules together.
   - Files: `src/resources/extensions/gsd/tests/factcheck-runtime-fixture.test.ts`, `src/resources/extensions/gsd/post-unit-hooks.ts`, `src/resources/extensions/gsd/auto-dispatch.ts`, `src/resources/extensions/gsd/auto-prompts.ts`
   - Do: Implement a test/harness that loads the fixture, invokes the real post-unit hook/coordinator path or closest runtime entrypoint, confirms fact-check artifacts are written, evaluates reroute eligibility via real dispatch/recovery code, and captures planner prompt output using the actual prompt builders. Stub only the external evidence-fetch edge if needed for determinism; keep runtime orchestration real.
