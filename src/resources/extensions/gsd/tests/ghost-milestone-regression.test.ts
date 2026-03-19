@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os';
 
 import { deriveState } from '../state.ts';
 import { createTestContext } from './test-helpers.ts';
+import { findMilestoneIds, isSubstantiveMilestone } from '../guided-flow.ts';
 
 const { assertEq, assertTrue, report } = createTestContext();
 
@@ -223,6 +224,171 @@ async function main(): Promise<void> {
       );
 
       console.log('\n  Mixed complete and ghost test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Edge Case Tests: isSubstantiveMilestone
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ─── Edge Case: Milestone with only CONTEXT file ───────────────────────────
+  console.log('\n=== milestone with only CONTEXT file is substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      const m1dir = join(base, '.gsd', 'milestones', 'M001');
+      mkdirSync(m1dir, { recursive: true });
+      writeFileSync(join(m1dir, 'M001-CONTEXT.md'), '---\nid: M001\n---\n# Context\nHas context only.');
+
+      assertTrue(
+        isSubstantiveMilestone(base, 'M001'),
+        'M001 with only CONTEXT is substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M001'),
+        true,
+        'M001 appears in findMilestoneIds result'
+      );
+
+      console.log('\n  CONTEXT-only milestone test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ─── Edge Case: Milestone with only SUMMARY file ───────────────────────────
+  console.log('\n=== milestone with only SUMMARY file is substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      const m2dir = join(base, '.gsd', 'milestones', 'M002');
+      mkdirSync(m2dir, { recursive: true });
+      writeFileSync(join(m2dir, 'M002-SUMMARY.md'), '---\nid: M002\n---\n# Summary\nCompleted.');
+
+      assertTrue(
+        isSubstantiveMilestone(base, 'M002'),
+        'M002 with only SUMMARY is substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M002'),
+        true,
+        'M002 appears in findMilestoneIds result'
+      );
+
+      console.log('\n  SUMMARY-only milestone test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ─── Edge Case: Milestone with only CONTEXT-DRAFT file ─────────────────────
+  console.log('\n=== milestone with only CONTEXT-DRAFT file is substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      const m3dir = join(base, '.gsd', 'milestones', 'M003');
+      mkdirSync(m3dir, { recursive: true });
+      writeFileSync(join(m3dir, 'M003-CONTEXT-DRAFT.md'), '---\nid: M003\n---\n# Draft\nWork in progress.');
+
+      assertTrue(
+        isSubstantiveMilestone(base, 'M003'),
+        'M003 with only CONTEXT-DRAFT is substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M003'),
+        true,
+        'M003 appears in findMilestoneIds result'
+      );
+
+      console.log('\n  CONTEXT-DRAFT-only milestone test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ─── Edge Case: Completely empty directory ─────────────────────────────────
+  console.log('\n=== completely empty directory is not substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      createGhostMilestone(base, 'M004');
+
+      assertTrue(
+        !isSubstantiveMilestone(base, 'M004'),
+        'M004 empty directory is not substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M004'),
+        false,
+        'M004 does NOT appear in findMilestoneIds result'
+      );
+
+      console.log('\n  Empty directory test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ─── Edge Case: Directory with only non-milestone file ─────────────────────
+  console.log('\n=== directory with only non-milestone file is not substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      const m5dir = join(base, '.gsd', 'milestones', 'M005');
+      mkdirSync(m5dir, { recursive: true });
+      writeFileSync(join(m5dir, 'notes.txt'), 'This is just some notes, not a milestone artifact.');
+
+      assertTrue(
+        !isSubstantiveMilestone(base, 'M005'),
+        'M005 with only notes.txt is not substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M005'),
+        false,
+        'M005 does NOT appear in findMilestoneIds result'
+      );
+
+      console.log('\n  Non-milestone file test PASSED.');
+    } finally {
+      cleanup(base);
+    }
+  }
+
+  // ─── Edge Case: Milestone with populated slices/ directory ─────────────────
+  console.log('\n=== milestone with populated slices directory is substantive ===');
+  {
+    const base = createFixtureBase();
+    try {
+      const m6dir = join(base, '.gsd', 'milestones', 'M006');
+      mkdirSync(m6dir, { recursive: true });
+      // Create slices/S01/ subdirectory (no artifact files)
+      mkdirSync(join(m6dir, 'slices', 'S01'), { recursive: true });
+
+      assertTrue(
+        isSubstantiveMilestone(base, 'M006'),
+        'M006 with only slices/ directory is substantive'
+      );
+
+      const ids = findMilestoneIds(base);
+      assertEq(
+        ids.includes('M006'),
+        true,
+        'M006 appears in findMilestoneIds result'
+      );
+
+      console.log('\n  Populated slices directory test PASSED.');
     } finally {
       cleanup(base);
     }
