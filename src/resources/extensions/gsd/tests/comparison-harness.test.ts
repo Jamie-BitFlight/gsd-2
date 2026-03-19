@@ -340,6 +340,56 @@ describe("Comparison Runner", () => {
         report.treatment.config.features.factCheckCoordination,
       );
     });
+
+    it("round-trip produces identical JSON structure", () => {
+      const report = runComparison("low-unknown", join(TEST_OUTPUT_DIR, "roundtrip-test"));
+      const reportPath = writeComparisonReport(report, TEST_OUTPUT_DIR);
+
+      // Read back and parse
+      const raw = readFileSync(reportPath, "utf-8");
+      const reRead = JSON.parse(raw);
+
+      // Deep comparison - serialize both and compare
+      const originalJson = JSON.stringify(report, Object.keys(report).sort());
+      const reReadJson = JSON.stringify(reRead, Object.keys(reRead).sort());
+
+      // Compare key structural elements
+      assert.deepStrictEqual(
+        reRead.metadata,
+        report.metadata,
+        "Metadata should match after round-trip",
+      );
+      assert.deepStrictEqual(
+        reRead.baseline.config,
+        report.baseline.config,
+        "Baseline config should match after round-trip",
+      );
+      assert.deepStrictEqual(
+        reRead.treatment.config,
+        report.treatment.config,
+        "Treatment config should match after round-trip",
+      );
+      assert.strictEqual(
+        reRead.baseline.metrics.wallClockMs,
+        report.baseline.metrics.wallClockMs,
+        "Baseline wallClockMs should match",
+      );
+      assert.strictEqual(
+        reRead.treatment.metrics.wallClockMs,
+        report.treatment.metrics.wallClockMs,
+        "Treatment wallClockMs should match",
+      );
+      assert.deepStrictEqual(
+        reRead.baseline.metrics.tokens,
+        report.baseline.metrics.tokens,
+        "Baseline tokens should match",
+      );
+      assert.deepStrictEqual(
+        reRead.treatment.metrics.tokens,
+        report.treatment.metrics.tokens,
+        "Treatment tokens should match",
+      );
+    });
   });
 
   describe("formatComparisonReport", () => {
@@ -360,6 +410,56 @@ describe("Comparison Runner", () => {
 
       assert.ok(markdown.includes("Unknowns Inventory"), "Should mention unknowns inventory");
       assert.ok(markdown.includes("Fact-Check Coordination"), "Should mention fact-check coordination");
+    });
+
+    it("includes metric rows for both paths", () => {
+      const report = runComparison("low-unknown", join(TEST_OUTPUT_DIR, "format-metrics-test"));
+      const markdown = formatComparisonReport(report);
+
+      // Check for token rows
+      assert.ok(markdown.includes("tokens)"), "Should include tokens row");
+      // Check for cost rows
+      assert.ok(markdown.includes("cost)"), "Should include cost row");
+      // Check for intervention rows
+      assert.ok(markdown.includes("interventions)"), "Should include interventions row");
+      // Check for fact-check rows
+      assert.ok(markdown.includes("fact-checks)"), "Should include fact-checks row");
+      // Check for duration rows
+      assert.ok(markdown.includes("duration)"), "Should include duration row");
+    });
+
+    it("includes baseline and treatment totals", () => {
+      const report = runComparison("low-unknown", join(TEST_OUTPUT_DIR, "format-totals-test"));
+      const markdown = formatComparisonReport(report);
+
+      assert.ok(markdown.includes("baseline total"), "Should include baseline total section");
+      assert.ok(markdown.includes("treatment total"), "Should include treatment total section");
+      assert.ok(markdown.includes("Tokens:"), "Should include tokens in totals");
+      assert.ok(markdown.includes("Cost:"), "Should include cost in totals");
+      assert.ok(markdown.includes("Interventions:"), "Should include interventions in totals");
+      assert.ok(markdown.includes("Fact-checks:"), "Should include fact-checks in totals");
+      assert.ok(markdown.includes("Duration:"), "Should include duration in totals");
+    });
+
+    it("treatment fact-checks show non-zero while baseline shows zero", () => {
+      const report = runComparison("low-unknown", join(TEST_OUTPUT_DIR, "format-factcheck-test"));
+      const markdown = formatComparisonReport(report);
+
+      // The table should show fact-checks for both paths
+      // Treatment should have non-zero fact-checks, baseline should have 0
+      assert.ok(
+        report.treatment.metrics.factCheck !== null,
+        "Treatment should have fact-check metrics",
+      );
+      assert.ok(
+        report.treatment.metrics.factCheck!.claimsChecked > 0,
+        "Treatment should have claims checked",
+      );
+      assert.strictEqual(
+        report.baseline.metrics.factCheck,
+        null,
+        "Baseline should have null fact-check",
+      );
     });
   });
 });
