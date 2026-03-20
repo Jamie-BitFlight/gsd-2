@@ -31,7 +31,11 @@ Create a contract test that serializes a fully-populated `UnitMetrics` object to
 
 - `npx tsx --test src/resources/extensions/gsd/tests/telemetry-contract.test.ts` — all pass
 
-## Inputs
+## Observability Impact
+
+- **Signals changed:** None — this task adds a static contract test, no runtime behavior changes.
+- **Inspection:** Future agents can run `npx tsx --test src/resources/extensions/gsd/tests/telemetry-contract.test.ts` to verify schema stability before/after metrics changes.
+- **Failure visibility:** Test failure indicates a breaking schema change that would break JSONL persistence or aggregation.
 
 - `src/resources/extensions/gsd/metrics.ts` — `UnitMetrics`, `InterventionCounts`, `FactCheckMetrics` type definitions
 - T01 verification confirms schema is complete

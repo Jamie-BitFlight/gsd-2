@@ -34,7 +34,7 @@
   - Verify: `npx tsx --test src/resources/extensions/gsd/tests/metrics-extended.test.ts src/resources/extensions/gsd/tests/metrics-io.test.ts src/resources/extensions/gsd/tests/activity-log-save.test.ts src/resources/extensions/gsd/tests/activity-log-prune.test.ts src/resources/extensions/gsd/tests/metrics.test.ts` — all pass
   - Done when: All tests pass, all dispatch paths are wired, schema includes all M007 fields
 
-- [ ] **T02: Add JSONL schema documentation and telemetry contract test** `est:45m`
+- [x] **T02: Add JSONL schema documentation and telemetry contract test** `est:45m`
   - Why: The schema is defined as a TypeScript interface but has no standalone documentation. A contract test ensures the JSONL format is stable for downstream consumers (S02 metrics aggregation, S03 fixture harness).
   - Files: `src/resources/extensions/gsd/tests/telemetry-contract.test.ts`, `src/resources/extensions/gsd/metrics.ts`
   - Do: Write a contract test that constructs a `UnitMetrics` object with all fields populated, serializes to JSON, deserializes, and asserts round-trip fidelity for every field including optional M007 fields (interventions, factCheck, wallClockMs, skills). Assert the JSON keys match the documented schema. This gives S02/S03 a regression-safe contract to depend on.
