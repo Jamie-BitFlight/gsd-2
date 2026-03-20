@@ -32,20 +32,25 @@ import { showProjectInit, offerMigration } from "./init-wizard.js";
 import { validateDirectory } from "./validate-directory.js";
 import { showConfirm } from "../shared/mod.js";
 import { debugLog } from "./debug-logger.js";
-import { findMilestoneIds, nextMilestoneId } from "./milestone-ids.js";
+import { MILESTONE_ID_RE, findMilestoneIds, isSubstantiveMilestone } from "./milestone-ids.js";
 import { parkMilestone, discardMilestone } from "./milestone-actions.js";
 
 // ─── Re-exports (preserve public API for existing importers) ────────────────
 export {
   MILESTONE_ID_RE, generateMilestoneSuffix, nextMilestoneId,
   extractMilestoneSeq, parseMilestoneId, milestoneIdSort,
-  maxMilestoneNum, findMilestoneIds,
+  maxMilestoneNum, findMilestoneIds, isSubstantiveMilestone,
 } from "./milestone-ids.js";
 export {
   showQueue, handleQueueReorder, showQueueAdd,
   buildExistingMilestonesContext,
 } from "./guided-flow-queue.js";
 import { getErrorMessage } from "./error-utils.js";
+
+// ─── Shared Constants ─────────────────────────────────────────────────────────
+
+/** Matches a milestone directory name prefix, e.g. "M001" or "M001-ab12cd". */
+export const MILESTONE_ID_REGEX = /^(M\d+(?:-[a-z0-9]{6})?)/;
 
 // ─── Commit Instruction Helpers ──────────────────────────────────────────────
 
