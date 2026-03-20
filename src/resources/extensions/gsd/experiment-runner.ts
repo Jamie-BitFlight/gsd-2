@@ -158,9 +158,9 @@ export function captureScoring(
   }
 
   // Merge rubric into scoring section
-  const scoring = report.scoring as ScoringSlot;
+  const scoring = report.scoring as unknown as Record<string, FidelityRubric>;
   scoring[path] = rubric;
-  report.scoring = scoring;
+  report.scoring = scoring as CompareReport["scoring"];
 
   // Write back
   writeJsonFile(reportPath, report);

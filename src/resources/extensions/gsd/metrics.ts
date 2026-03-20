@@ -56,6 +56,7 @@ export interface UnitMetrics {
   baselineCharCount?: number;
   tier?: string;           // complexity tier (light/standard/heavy) if dynamic routing active
   modelDowngraded?: boolean; // true if dynamic routing used a cheaper model
+  skills?: string[];       // skill names available/loaded during this unit (#599)
   // Intervention & fact-check metrics (optional — M007+)
   interventions?: InterventionCounts;
   factCheck?: FactCheckMetrics;
