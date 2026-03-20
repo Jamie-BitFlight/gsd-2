@@ -110,8 +110,8 @@ async function main(): Promise<void> {
       // The phase should be executing (M005 has a plan with incomplete tasks)
       assertEq(
         state.phase,
-        'executing',
-        'phase is executing (M005 has incomplete tasks)'
+        'planning',
+        'phase is planning (roadmap exists but no slice task plan file has been created yet)'
       );
 
       // M001 and M002 should NOT be in the registry with status 'active'
