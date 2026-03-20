@@ -1,0 +1,17 @@
+{
+  "claimId": "C003",
+  "text": "The caching layer supports Redis Cluster with automatic failover",
+  "source": "src/cache/cluster.ts",
+  "verdict": "refuted",
+  "citations": [
+    "src/cache/cluster.ts:1-50",
+    "docs/architecture.md#caching"
+  ],
+  "correctedValue": "Single Redis instance with Sentinel for HA - Cluster mode not implemented",
+  "impact": "slice",
+  "checkedBy": "scout-concept",
+  "timestamp": "2026-03-19T13:50:00Z",
+  "confidence": 0.92,
+  "notes": "Code uses standalone Redis client. Sentinel configuration exists for high availability, but Redis Cluster mode is not implemented. Claim contradicted by architecture documentation.",
+  "scoutTokens": 1100
+}

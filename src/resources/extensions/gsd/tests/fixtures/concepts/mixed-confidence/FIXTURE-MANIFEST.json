@@ -1,0 +1,73 @@
+{
+  "id": "concept-mixed-confidence-v1",
+  "scenarioDescription": "A balanced domain with mixed verification outcomes. Simulates a moderately understood codebase where some claims are verified, some are refuted, and others remain inconclusive — representing realistic fact-check scenarios where certainty varies.",
+  "milestoneId": "M003-CONCEPT",
+  "sliceId": "S01",
+  "createdAt": "2026-03-19T00:00:00Z",
+  "version": 1,
+  "claimMix": {
+    "total": 4,
+    "confirmed": 2,
+    "refuted": 1,
+    "inconclusive": 1,
+    "unresolved": 0
+  },
+  "expectedTelemetryShape": {
+    "interventions": {
+      "expected": false
+    },
+    "factCheck": {
+      "claimsChecked": 4,
+      "verified": 2,
+      "refuted": 1,
+      "inconclusive": 1
+    },
+    "wallClockMs": true
+  },
+  "successCriteria": {
+    "maxInterventions": 0,
+    "minVerifiedRatio": 0.5
+  },
+  "claims": [
+    {
+      "claimId": "C001",
+      "text": "The authentication middleware validates JWT tokens with RS256",
+      "source": "src/auth/middleware.ts",
+      "verdict": "confirmed",
+      "confidence": 0.88
+    },
+    {
+      "claimId": "C002",
+      "text": "The message queue uses RabbitMQ with persistent queues",
+      "source": "src/queue/config.ts",
+      "verdict": "confirmed",
+      "confidence": 0.75
+    },
+    {
+      "claimId": "C003",
+      "text": "The caching layer supports Redis Cluster with automatic failover",
+      "source": "src/cache/cluster.ts",
+      "verdict": "refuted",
+      "confidence": 0.92
+    },
+    {
+      "claimId": "C004",
+      "text": "The webhook system implements exponential backoff retries",
+      "source": "src/webhooks/retry.ts",
+      "verdict": "inconclusive",
+      "confidence": 0.55
+    }
+  ],
+  "requiredFiles": [
+    "state/slices/S01/factcheck/FACTCHECK-STATUS.json",
+    "state/slices/S01/factcheck/claims/C001.json",
+    "state/slices/S01/factcheck/claims/C002.json",
+    "state/slices/S01/factcheck/claims/C003.json",
+    "state/slices/S01/factcheck/claims/C004.json"
+  ],
+  "redactionConstraints": {
+    "secretsPresent": false,
+    "personalDataPresent": false,
+    "syntheticOnly": true
+  }
+}

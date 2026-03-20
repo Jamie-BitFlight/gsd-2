@@ -1,0 +1,16 @@
+{
+  "claimId": "C001",
+  "text": "The authentication middleware validates JWT tokens with RS256",
+  "source": "src/auth/middleware.ts",
+  "verdict": "confirmed",
+  "citations": [
+    "src/auth/middleware.ts:45-80",
+    "docs/security.md#jwt-validation"
+  ],
+  "impact": "none",
+  "checkedBy": "scout-concept",
+  "timestamp": "2026-03-19T13:30:00Z",
+  "confidence": 0.88,
+  "notes": "JWT validation explicitly uses RS256 algorithm. Public key is loaded from JWKS endpoint. Token expiration and issuer claims are validated.",
+  "scoutTokens": 980
+}

@@ -181,6 +181,46 @@ const REQUIRED_FIELDS: (keyof FixtureManifest)[] = [
   "requiredFiles",
 ];
 
+/**
+ * Validation result for fixture state integrity check.
+ */
+export interface FixtureStateValidation {
+  valid: boolean;
+  missingFiles: string[];
+}
+
+/**
+ * Validate that all required files from a fixture manifest exist in the target state tree.
+ *
+ * After loadFixture copies the state/ tree into targetBase/state/, this function
+ * checks that each entry in manifest.requiredFiles exists at the expected path.
+ *
+ * @param manifest - The fixture manifest to validate against
+ * @param targetBase - The target base directory containing the copied state tree
+ * @returns Validation result with valid status and list of missing files
+ */
+export function validateFixtureState(
+  manifest: FixtureManifest,
+  targetBase: string
+): FixtureStateValidation {
+  const missingFiles: string[] = [];
+
+  for (const requiredFile of manifest.requiredFiles) {
+    // requiredFiles entries are relative paths like "state/slices/S01/factcheck/..."
+    // The target has state/ copied to targetBase/state/
+    const fullPath = join(targetBase, requiredFile);
+
+    if (!existsSync(fullPath)) {
+      missingFiles.push(requiredFile);
+    }
+  }
+
+  return {
+    valid: missingFiles.length === 0,
+    missingFiles,
+  };
+}
+
 function validateManifest(manifest: FixtureManifest, fixtureId: string): void {
   const missing = REQUIRED_FIELDS.filter((field) => !(field in manifest));
 

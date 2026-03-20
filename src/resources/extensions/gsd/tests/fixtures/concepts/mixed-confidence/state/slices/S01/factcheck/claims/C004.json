@@ -1,0 +1,13 @@
+{
+  "claimId": "C004",
+  "text": "The webhook system implements exponential backoff retries",
+  "source": "src/webhooks/retry.ts",
+  "verdict": "inconclusive",
+  "citations": [],
+  "impact": "none",
+  "checkedBy": "scout-concept",
+  "timestamp": "2026-03-19T14:00:00Z",
+  "confidence": 0.55,
+  "notes": "Found retry logic with configurable delay, but implementation uses fixed interval retry (3 attempts with 5s gap). Exponential backoff may be planned but not currently implemented. Further investigation needed.",
+  "scoutTokens": 720
+}
