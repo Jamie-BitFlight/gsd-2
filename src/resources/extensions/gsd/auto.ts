@@ -122,11 +122,14 @@ import {
 import {
   initMetrics,
   resetMetrics,
+  snapshotUnitMetrics,
   getLedger,
   getProjectTotals,
   formatCost,
   formatTokenCount,
+  type UnitMetrics,
 } from "./metrics.js";
+import { persistUnitMetrics } from "./metrics-logger.js";
 import { join } from "node:path";
 import { readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { atomicWriteSync } from "./atomic-write.js";
@@ -1293,7 +1296,7 @@ async function dispatchNextUnit(
     // Save final session before stopping
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
       saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
     }
 
@@ -1338,7 +1341,7 @@ async function dispatchNextUnit(
   if (!mid || !midTitle) {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
       saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
     }
     const noMilestoneReason = !mid
@@ -1356,7 +1359,7 @@ async function dispatchNextUnit(
   if (state.phase === "complete") {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
       saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
     }
     // Clear completed-units.json for the finished milestone so it doesn't grow unbounded.
@@ -1430,7 +1433,7 @@ async function dispatchNextUnit(
   if (state.phase === "blocked") {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
       saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
     }
     const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
@@ -1541,7 +1544,7 @@ async function dispatchNextUnit(
   if (dispatchResult.action === "stop") {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
       saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
     }
     await stopAuto(ctx, pi, dispatchResult.reason);
@@ -1763,7 +1766,7 @@ async function dispatchNextUnit(
   if (lifetimeCount > MAX_LIFETIME_DISPATCHES) {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
     }
     saveActivityLog(ctx, basePath, unitType, unitId);
     const expected = diagnoseExpectedArtifact(unitType, unitId, basePath);
@@ -1777,7 +1780,7 @@ async function dispatchNextUnit(
   if (prevCount >= MAX_UNIT_DISPATCHES) {
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
     }
     saveActivityLog(ctx, basePath, unitType, unitId);
 
@@ -1935,7 +1938,7 @@ async function dispatchNextUnit(
   // The session still holds the previous unit's data (newSession hasn't fired yet).
   if (currentUnit) {
     const modelId = ctx.model?.id ?? "unknown";
-    snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+    const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
     const activityFile = saveActivityLog(ctx, basePath, currentUnit.type, currentUnit.id);
 
     // Fire-and-forget memory extraction from completed unit
@@ -2317,7 +2320,7 @@ async function dispatchNextUnit(
 
     if (currentUnit) {
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
     }
     saveActivityLog(ctx, basePath, unitType, unitId);
 
@@ -2343,7 +2346,7 @@ async function dispatchNextUnit(
         timeoutAt: Date.now(),
       });
       const modelId = ctx.model?.id ?? "unknown";
-      snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) });
+      const unit = snapshotUnitMetrics(ctx, currentUnit.type, currentUnit.id, currentUnit.startedAt, modelId, { promptCharCount: lastPromptCharCount, baselineCharCount: lastBaselineCharCount, ...(currentUnitRouting ?? {}) }); if (unit) persistUnitMetrics(basePath, unit);
     }
     saveActivityLog(ctx, basePath, unitType, unitId);
 
