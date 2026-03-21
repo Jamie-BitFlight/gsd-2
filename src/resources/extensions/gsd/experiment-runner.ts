@@ -14,7 +14,7 @@ import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import type { CompareReport, SummarizedMetrics } from "./compare-runner.js";
 import { runComparison, writeComparisonReport } from "./compare-runner.js";
-import { writeJsonFile } from "./files.js";
+import { saveJsonFile as writeJsonFile } from "./json-persistence.js";
 
 // ─── Local JSON helpers ────────────────────────────────────────────────────────
 

@@ -18,7 +18,7 @@ import { loadFixture, getFixturePath } from "./tests/fixture-harness.js";
 import type { FactCheckMetrics, UnitMetrics, TokenCounts, MetricsLedger } from "./metrics.js";
 import { extractFactCheckMetrics } from "./metrics.js";
 import { summarizeMetrics, formatComparisonTable, type LedgerInput } from "./summarize-metrics.js";
-import { writeJsonFile } from "./files.js";
+import { saveJsonFile as writeJsonFile } from "./json-persistence.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
