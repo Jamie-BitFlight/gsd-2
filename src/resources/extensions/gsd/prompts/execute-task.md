@@ -76,7 +76,6 @@ Then:
 18. Write `{{taskSummaryPath}}`
 19. Mark {{taskId}} done in `{{planPath}}` (change `[ ]` to `[x]`)
 20. Do not run git commands — the system auto-commits your changes after this unit completes.
-21. Update `.gsd/STATE.md`
 
 All work stays in your working directory: `{{workingDirectory}}`.
 

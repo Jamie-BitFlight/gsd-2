@@ -36,7 +36,6 @@ Then:
 11. Mark {{sliceId}} done in `{{roadmapPath}}` (change `[ ]` to `[x]`)
 12. Do not run git commands — the system auto-commits your changes and handles the merge after this unit succeeds.
 13. Update `.gsd/PROJECT.md` if it exists — refresh current state if needed.
-14. Update `.gsd/STATE.md`
 
 **You MUST do ALL THREE before finishing: (1) write `{{sliceSummaryPath}}`, (2) write `{{sliceUatPath}}`, (3) mark {{sliceId}} as `[x]` in `{{roadmapPath}}`. The unit will not be marked complete if any of these files are missing.**
 
